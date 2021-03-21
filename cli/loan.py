@@ -63,6 +63,9 @@ def loan(amount: float, currency: str):
 def end_loan(loan_id: str, target_currency: str):
     """
     End a loan.
+
+    LOAN_ID - ID of the loan as it appears in the db
+    TARGET_CURRENCY - Currency to pay the loan
     """
     # Retrieve the loan from the db.
     client = init_mongo_client()
