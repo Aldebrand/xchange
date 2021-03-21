@@ -1,0 +1,1 @@
+{"base_commission": 5, "daily_commission": 0.5, "db": {"init_db": true, "address": "mongodb://localhost:27017/", "username": "spinelsun", "password": "shelasa"}}
