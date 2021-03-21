@@ -64,6 +64,7 @@ def end_loan(loan_id: str, target_currency: str):
     """
     End a loan.
 
+    \b
     LOAN_ID - ID of the loan as it appears in the db
     TARGET_CURRENCY - Currency to pay the loan
     """
