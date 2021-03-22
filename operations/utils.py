@@ -49,12 +49,20 @@ def init_mongo_client() -> pymongo.MongoClient:
 
 def convert_money(origin_currency: str, target_currency: str,
                   amount: float) -> float:
+    """
+    Convert a certain amount of money from one currency to another.
+
+    :param origin_currency: Origin currency
+    :param target_currency: Target currency
+    :param amount: Amount of money to convert
+    :return: Converted amount
+    """
     result = convert(origin_currency.upper(), target_currency.upper(), amount)
     result = json.loads(result)
     succeed = result.get('converted', False)
 
-    # Check if the conversion completed successfully.
-    # If not, print and error message and exit the cli.
+    # Check if the conversion completed successfully and return the converted
+    # amount, otherwise return zero.
     if not succeed:
         return 0
 
