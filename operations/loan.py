@@ -9,12 +9,14 @@ from operations.utils import convert_money, init_mongo_client, load_config
 DATE_FORMAT = '%d/%m/%Y'
 
 
-def loan(amount: float, currency: str) -> Tuple[Optional[str], Optional[str]]:
+def loan(amount: float,
+         currency: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Register a new loan.
 
     :param amount: Amount of money that the user loaned
     :param currency: Loan currency
+    :return: Loan ID and success or error message
     """
     # Load the commissions for loans.
     config = load_config()
@@ -40,7 +42,7 @@ def loan(amount: float, currency: str) -> Tuple[Optional[str], Optional[str]]:
         error_msg = ('An Unknown error has been occurred while trying to '
                      f'register a new loan: {e}')
 
-        return None, error_msg
+        return None, None, error_msg
 
     # Build the loan summery message.
     loan_id = str(result.inserted_id)
@@ -58,7 +60,7 @@ def loan(amount: float, currency: str) -> Tuple[Optional[str], Optional[str]]:
                start_date=start_date,
                id=loan_id)
 
-    return success_msg, None
+    return loan_id, success_msg, None
 
 
 def end_loan(loan_id: str,
@@ -68,6 +70,7 @@ def end_loan(loan_id: str,
 
     :param loan_id: ID of the loan as it appears in the db
     :param target_currency: Currency to pay the loan
+    :return: Success or error message
     """
     # Retrieve the loan from the db.
     try:
@@ -91,9 +94,18 @@ def end_loan(loan_id: str,
     loan_base_commission = result['base_commission']
     loan_daily_commission = result['daily_commission']
 
+    # If the loan is already paid back get its end day, otherwise
+    # set its end date to today and update the db.
+    if result.get('end_date'):
+        end_date_str = result.get('end_date')
+        end_date = datetime.strptime(end_date_str, DATE_FORMAT)
+    else:
+        end_date = datetime.today()
+        end_date_str = end_date.date().strftime(DATE_FORMAT)
+        new_data = {'$set': {'end_date': end_date_str}}
+        loans_coll.update_one(query, new_data)
+
     # Calculate the loan period.
-    end_date = datetime.today()
-    end_date_str = end_date.date().strftime(DATE_FORMAT)
     delta = end_date - start_date
     days_passed = delta.days
 
@@ -132,7 +144,7 @@ def end_loan(loan_id: str,
                loan_currency=currency.upper(),
                base_commission=loan_base_commission,
                daily_commission=loan_daily_commission,
-               start_date=start_date,
+               start_date=start_date_str,
                id=loan_id,
                paid_currency=target_currency.upper(),
                amount_before_commission=converted_amount,

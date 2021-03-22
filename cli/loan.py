@@ -14,7 +14,9 @@ def loan(amount: float, currency: str):
     AMOUNT - amount of money that the user loaned
     CURRENCY - loan currency
     """
-    success_msg, error_msg = ops_loan.loan(amount, currency)
+    result = ops_loan.loan(amount, currency)
+    success_msg = result[1]
+    error_msg = result[2]
 
     if error_msg:
         click.secho(error_msg, fg='red', bold=True, err=True)
