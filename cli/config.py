@@ -1,6 +1,6 @@
 import click
 
-from cli.utils import load_config, update_config
+from operations import config as ops_config
 
 
 @click.group()
@@ -18,12 +18,10 @@ def base_commission(commission):
     \b
     COMMISSION - new commission
     """
-    config = load_config()
-    config['base_commission'] = commission
+    success_msg, error_msg = ops_config.base_commission(commission)
 
-    try:
-        update_config(config=config)
-    except Exception as e:
-        msg = f'The following error has been occurred: {e}'
-        click.secho(msg, fg='red', bold=True, err=True)
+    if error_msg:
+        click.secho(error_msg, fg='red', bold=True, err=True)
         click.get_current_context().exit(1)
+
+    click.secho(success_msg, fg='green')

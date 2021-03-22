@@ -61,3 +61,20 @@ def convert_money(origin_currency: str, target_currency: str,
     converted_amount = float(result.get('amount', 0))
 
     return converted_amount
+
+
+def init_db():
+    """
+    Initialize a database.
+    """
+    config = load_config()
+    db_config = config['db']
+    do_init = db_config['init_db']
+
+    if do_init:
+        client = init_mongo_client()
+        db = client['xchange']
+        db.create_collection('loans')
+        config['db']['init_db'] = False
+        update_config(config=config)
+        client.close()
