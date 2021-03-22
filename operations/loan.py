@@ -76,6 +76,7 @@ def end_loan(loan_id: str,
         loans_coll = db.get_collection('loans')
         query = {'_id': ObjectId(loan_id)}
         result = loans_coll.find_one(query)
+        client.close()
     except Exception as e:
         error_msg = ('An Unknown error has been occurred while trying to '
                      f'retrieve the requested loan: {e}')
