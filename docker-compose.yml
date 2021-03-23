@@ -1,5 +1,21 @@
 version: "3.8"
 services:
+  server:
+    image: xchange/server:1.0
+    build:
+      context: .
+      dockerfile: services/server/Dockerfile
+    depends_on:
+      - mongo
+    volumes:
+      - type: bind
+        source: .
+        target: /usr/src/xchange
+    ports:
+      - "8200:8200"
+    links:
+      - mongo
+
   mongo:
     image: mongo
     restart: always
