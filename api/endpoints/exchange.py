@@ -11,15 +11,19 @@ from operations import exchange as ops_exchange
 
 @api_view(['GET'])
 def exchange(request: Request) -> Response:
-    amount = request.query_params.get('amount')
+    
     origin_currency = request.query_params.get('originCurrency')
     target_currency = request.query_params.get('targetCurrency', 'EUR')
 
     # Validating the request data
     try:
+        amount = float(request.query_params.get('amount'))
         ExchangeRequest(amount=amount,
                         origin_currency=origin_currency,
                         target_currency=target_currency)
+    except ValueError:
+        return Response('amount must be of type int or float',
+                        status.HTTP_400_BAD_REQUEST)
     except PydanticValidationError as pve:
         return Response(pve.json(), status.HTTP_400_BAD_REQUEST)
 

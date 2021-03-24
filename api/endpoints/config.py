@@ -11,11 +11,15 @@ from operations import config as ops_config
 
 @api_view(['PATCH'])
 def update_commission(request: Request) -> Response:
-    new_commission = request.data.get('commission')
 
     # Validating the request data
     try:
+        print('hi')
+        new_commission = float(request.data.get('commission'))
         ConfigRequest(commission=new_commission)
+    except ValueError:
+        return Response('commission must be of type int or float',
+                        status.HTTP_400_BAD_REQUEST)
     except PydanticValidationError as pve:
         return Response(pve.json(), status.HTTP_400_BAD_REQUEST)
 

@@ -37,7 +37,7 @@ def exchange(amount: int, origin_currency: str,
     commission = config.get('base_commission', 5)
     commission_percent = commission / 100
     profit = converted_amount * commission_percent
-    amount_after_commission = converted_amount - profit
+    amount_after_commission = round(converted_amount - profit, 3)
 
     # Build summery message.
     success_msg = """
